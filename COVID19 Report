@@ -52,15 +52,6 @@ WHERE continent IS NOT NULL
 ORDER BY 1,2;
 
 
-
-
-
-
-
-
-
-
-
 -- Total Population vs Vaccinations
 -- Shows Percentage of Population that has recieved at least one Covid Vaccine
 
@@ -92,13 +83,6 @@ Order by 1,2
 
 Select *, (Rolling_Vaccinated*1.0/Population)*100 as Rolling_Vaccinated_Percentage
 From PopvsVac;
-
-
-
-
-
-
-
 
 
 -- Using Temp Table to perform Calculation on Partition By in previous query
