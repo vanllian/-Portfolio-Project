@@ -1,6 +1,8 @@
+-- Covid19 Report using SQLite
+
 -- Total Cases vs Total Deaths
--- Shows the likelihood of dying if you contract covid in your country. In this particular case the loccation is United States. 
-SELECT Location, date, total_cASes,total_deaths, (total_deaths *1.0/total_cASes)*100 AS Death_Percentage
+-- Shows the likelihood of dying if contracted covid by each country. In this particular case the location is United States. 
+SELECT Location, date, total_cases,total_deaths, (total_deaths *1.0/total_cASes)*100 AS Death_Percentage
 FROM CovidDeaths
 WHERE location LIKE '%states%'
 AND continent IS NOT NULL
@@ -9,21 +11,21 @@ ORDER BY 1,2;
 
 -- Total Cases vs Population
 -- Shows the percentage of population in the United States infected with Covid
-SELECT Location, date, Population, total_cASes,  (total_cASes*1.0/population)*100 AS Percent_Population_Infected
+SELECT Location, date, Population, total_cASes,  (total_cases*1.0/population)*100 AS Percent_Population_Infected
 FROM CovidDeaths
 WHERE location LIKE '%states%'
 ORDER BY 1,2;
 
 
 -- Countries with Highest Infection Rate compared to Population
-SELECT Location, Population, MAX(total_cASes) AS Highest_Infection_Count, Max((total_cASes *1.0/population))*100 AS Percent_Population_Infected
+SELECT Location, Population, MAX(total_cases) AS Highest_Infection_Count, Max((total_cases *1.0/population))*100 AS Percent_Population_Infected
 FROM CovidDeaths
 GROUP BY Location, Population
 ORDER BY Percent_Population_Infected DESC;
 
 
 -- Countries with Highest Death Count per Population
-SELECT Location, MAX(cASt(Total_deaths AS int)) AS Total_Death_Count
+SELECT Location, MAX(cast(Total_deaths AS int)) AS Total_Death_Count
 FROM CovidDeaths
 WHERE continent IS NOT NULL
 GROUP BY Location
@@ -31,7 +33,7 @@ ORDER BY Total_Death_Count DESC;
 
 
 -- Showing contintents with the highest death count per population
-SELECT continent, MAX(cASt(Total_deaths AS int)) AS Total_Death_Count
+SELECT continent, MAX(cast(Total_deaths AS int)) AS Total_Death_Count
 FROM CovidDeaths
 WHERE continent IS NOT NULL
 GROUP BY continent
@@ -39,19 +41,19 @@ ORDER BY Total_Death_Count DESC;
 
 
 
--- GLOBAL NUMBERS
-SELECT SUM(new_cASes) AS total_cASes, SUM(cASt(new_deaths AS int)) AS total_deaths, 
-SUM(cASt(new_deaths AS int))/SUM(New_CASes*1.0)*100 AS Death_Percentage
+-- Glabal Numbers
+SELECT SUM(new_cases) AS total_cases, SUM(cast(new_deaths AS int)) AS total_deaths, 
+SUM(cast(new_deaths AS int))/SUM(New_CASes*1.0)*100 AS Death_Percentage
 FROM CovidDeaths
 WHERE continent IS NOT NULL
 ORDER BY 1,2;
 
 
 -- Total Population vs Vaccinations
--- Shows Percentage of Population that hAS recieved at least one Covid vaccine
+-- Shows Percentage of Population that has recieved at least one Covid vaccine
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
-SUM(cASt(vac.new_vaccinations AS int)) 
-OVER (PARTITIon BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
+SUM(cast(vac.new_vaccinations AS int)) 
+OVER (partition BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
 FROM CovidDeaths dea
 JOIN CovidVaccinations vac
     ON dea.location = vac.location
@@ -64,7 +66,7 @@ ORDER BY 2,3;
 With PopvsVac (Continent, Location, Date, Population, New_Vaccinations, Rolling_Vaccinated AS
 (
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
-SUM(cASt(vac.new_vaccinations AS int)) 
+SUM(cast(vac.new_vaccinations AS int)) 
 OVER (PARTITIon BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
 FROM CovidDeaths dea
 JOIN CovidVaccinations vac
@@ -91,12 +93,12 @@ Rolling_Vaccinated NUMERIC
 
 INSERT INTO Population_Vaccinated_Percentage
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
-SUM(cASt(vac.new_vaccinations AS int)) 
-OVER (PARTITIon BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
-FROM CovidDeaths dea
-JOIN CovidVaccinations vac
-    ON dea.location = vac.location
-    AND dea.date = vac.date
+SUM(cast(vac.new_vaccinations AS int)) 
+OVER (partition BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
+FROM CovidDeaths dea 
+JOIN CovidVaccinations vac 
+    ON dea.location = vac.location 
+    AND dea.date = vac.date 
 WHERE dea.continent IS NOT NULL
 ORDER BY 2,3; 
 
@@ -107,8 +109,8 @@ FROM Population_Vaccinated_Percentage;
 -- Creating View to store data for later visualizations
 CREATE VIEW PVC AS
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
-SUM(cASt(vac.new_vaccinations AS int)) 
-OVER (PARTITIon BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
+SUM(cast(vac.new_vaccinations AS int)) 
+OVER (partition BY dea.location ORDER BY dea.location, dea.Date) AS Rolling_Vaccinated
 FROM CovidDeaths dea
 JOIN CovidVaccinations vac
     ON dea.location = vac.location
