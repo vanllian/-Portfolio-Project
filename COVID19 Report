@@ -104,7 +104,7 @@ SELECT *, (Rolling_Vaccinated*1.0/Population)*100 AS Population_Vaccinated_Perce
 FROM Population_Vaccinated_Percentage;
 
 
--- Creating view to store data for later visualizations
+-- Creating View to store data for later visualizations
 CREATE VIEW PVC AS
 SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations, 
 SUM(cASt(vac.new_vaccinations AS int)) 
