@@ -1,4 +1,4 @@
--- Covid19 Report using SQLite
+-- Covid19 Report using SQLiteStudio
 
 -- Total Cases vs Total Deaths
 -- Shows the likelihood of dying if contracted covid by each country. In this particular case the location is United States. 
